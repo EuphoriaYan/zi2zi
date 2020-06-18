@@ -6,9 +6,10 @@ import os
 import glob
 
 import imageio
-import scipy.misc as misc
+from imageio import imread
 import numpy as np
-from cStringIO import StringIO
+from io import StringIO
+from PIL import Image
 
 
 def pad_seq(seq, batch_size):
@@ -34,7 +35,7 @@ def normalize_image(img):
 
 
 def read_split_image(img):
-    mat = misc.imread(img).astype(np.float)
+    mat = imread(img).astype(np.float)
     side = int(mat.shape[1] / 2)
     assert side * 2 == mat.shape[1]
     img_A = mat[:, :side]  # target
@@ -45,7 +46,10 @@ def read_split_image(img):
 
 def shift_and_resize_image(img, shift_x, shift_y, nw, nh):
     w, h, _ = img.shape
-    enlarged = misc.imresize(img, [nw, nh])
+    # old realization(scipy < 1.0.0)
+    # enlarged = scipy.misc.imresize(img, [nw, nh])
+    # new realization
+    enlarged = np.array(Image.fromarray(img).resize((nw, nh)))
     return enlarged[shift_x:shift_x + w, shift_y:shift_y + h]
 
 
@@ -66,12 +70,19 @@ def merge(images, size):
 
 def save_concat_images(imgs, img_path):
     concated = np.concatenate(imgs, axis=1)
-    misc.imsave(img_path, concated)
+    imageio.mimsave(img_path, concated)
 
 
 def compile_frames_to_gif(frame_dir, gif_file):
     frames = sorted(glob.glob(os.path.join(frame_dir, "*.png")))
     print(frames)
-    images = [misc.imresize(imageio.imread(f), interp='nearest', size=0.33) for f in frames]
+    # old realization(scipy < 1.0.0)
+    # images = [imresize(imageio.imread(f), interp='nearest', size=0.33) for f in frames]
+    # new realization
+    images = [np.array(
+        Image.fromarray(f).resize(
+            (int(f.shape[0]*0.33), int(f.shape[1]*0.33))
+        )
+    ) for f in frames]
     imageio.mimsave(gif_file, images, duration=0.1)
     return gif_file

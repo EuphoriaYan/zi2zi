@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import argparse
 import glob
 import os
-import cPickle as pickle
+import pickle
 import random
 
 
@@ -37,6 +37,8 @@ parser.add_argument('--split_ratio', type=float, default=0.1, dest='split_ratio'
 args = parser.parse_args()
 
 if __name__ == "__main__":
+    if not os.path.isdir(args.save_dir):
+        os.mkdir(args.save_dir)
     train_path = os.path.join(args.save_dir, "train.obj")
     val_path = os.path.join(args.save_dir, "val.obj")
     pickle_examples(sorted(glob.glob(os.path.join(args.dir, "*.jpg"))), train_path=train_path, val_path=val_path,
