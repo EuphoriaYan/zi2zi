@@ -12,9 +12,6 @@ from PIL import ImageFont
 import json
 import collections
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
 CN_CHARSET = None
 CN_T_CHARSET = None
 JP_CHARSET = None
@@ -56,7 +53,7 @@ def filter_recurring_hash(charset, font, canvas_size, x_offset, y_offset):
     """ Some characters are missing in a given font, filter them
     by checking the recurring hashes
     """
-    _charset = charset[:]
+    _charset = charset.copy()
     np.random.shuffle(_charset)
     sample = _charset[:2000]
     hash_count = collections.defaultdict(int)
@@ -86,25 +83,24 @@ def font2img(src, dst, charset, char_size, canvas_size,
         if e:
             e.save(os.path.join(sample_dir, "%d_%04d.jpg" % (label, count)))
             count += 1
-            if count % 100 == 0:
+            if count % 1000 == 0:
                 print("processed %d chars" % count)
 
 
 load_global_charset()
-parser = argparse.ArgumentParser(description='Convert font to images')
-parser.add_argument('--src_font', dest='src_font', required=True, help='path of the source font')
-parser.add_argument('--dst_font', dest='dst_font', required=True, help='path of the target font')
-parser.add_argument('--filter', dest='filter', type=int, default=0, help='filter recurring characters')
-parser.add_argument('--charset', dest='charset', type=str, default='CN',
-                    help='charset, can be either: CN, JP, KR or a one line file')
-parser.add_argument('--shuffle', dest='shuffle', type=int, default=0, help='shuffle a charset before processings')
-parser.add_argument('--char_size', dest='char_size', type=int, default=150, help='character size')
-parser.add_argument('--canvas_size', dest='canvas_size', type=int, default=256, help='canvas size')
-parser.add_argument('--x_offset', dest='x_offset', type=int, default=20, help='x offset')
-parser.add_argument('--y_offset', dest='y_offset', type=int, default=20, help='y_offset')
-parser.add_argument('--sample_count', dest='sample_count', type=int, default=1000, help='number of characters to draw')
-parser.add_argument('--sample_dir', dest='sample_dir', help='directory to save examples')
-parser.add_argument('--label', dest='label', type=int, default=0, help='label as the prefix of examples')
+parser = argparse.ArgumentParser()
+parser.add_argument('--src_font', required=True, help='path of the source font')
+parser.add_argument('--dst_font', required=True, help='path of the target font')
+parser.add_argument('--filter', type=bool, default=False, help='filter recurring characters')
+parser.add_argument('--charset', type=str, default='CN', help='charset, can be either: CN, JP, KR or a one line file')
+parser.add_argument('--shuffle', type=bool, default=True, help='shuffle a charset before processings')
+parser.add_argument('--char_size', type=int, default=150, help='character size')
+parser.add_argument('--canvas_size', type=int, default=256, help='canvas size')
+parser.add_argument('--x_offset', type=int, default=20, help='x offset')
+parser.add_argument('--y_offset', type=int, default=20, help='y_offset')
+parser.add_argument('--sample_count', type=int, default=5000, help='number of characters to draw')
+parser.add_argument('--sample_dir', type=str, default='sample_dir', help='directory to save examples')
+parser.add_argument('--label', type=int, default=0, help='label as the prefix of examples')
 
 args = parser.parse_args()
 
@@ -112,9 +108,11 @@ if __name__ == "__main__":
     if args.charset in ['CN', 'JP', 'KR', 'CN_T']:
         charset = locals().get("%s_CHARSET" % args.charset)
     else:
-        charset = [c for c in open(args.charset).readline()[:-1].decode("utf-8")]
+        charset = list(open(args.charset, encoding='utf-8').readline().strip())
     if args.shuffle:
         np.random.shuffle(charset)
+    if not os.path.isdir(args.sample_dir):
+        os.mkdir(args.sample_dir)
     font2img(args.src_font, args.dst_font, charset, args.char_size,
              args.canvas_size, args.x_offset, args.y_offset,
              args.sample_count, args.sample_dir, args.label, args.filter)
