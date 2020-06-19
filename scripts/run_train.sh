@@ -5,7 +5,8 @@ experiment_id=0
 batch_size=32
 learning_rate=1e-3
 epoch=100
-sample_step=100
+sample_steps=100
+checkpoint_steps=500
 schedule=20
 
 python train.py \
@@ -14,5 +15,6 @@ python train.py \
 --batch_size ${batch_size} \
 --lr ${learning_rate} \
 --epoch ${epoch} \
---sample_step ${sample_step} \
+--sample_steps ${sample_steps} \
+--checkpoint_steps ${checkpoint_steps} \
 --schedule ${schedule}
