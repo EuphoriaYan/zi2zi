@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import tensorflow.compat.v1 as tf
 import numpy as np
-import scipy.misc as misc
+import imageio
 import os
 import time
 from collections import namedtuple
@@ -379,7 +379,7 @@ class UNet(object):
             os.makedirs(model_sample_dir)
 
         sample_img_path = os.path.join(model_sample_dir, "sample_%02d_%04d.png" % (epoch, step))
-        misc.imsave(sample_img_path, merged_pair)
+        imageio.mimsave(sample_img_path, merged_pair)
 
     def export_generator(self, save_dir, model_dir, model_name="gen_model"):
         saver = tf.train.Saver()
