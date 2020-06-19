@@ -1,6 +1,6 @@
 
 python font2img.py \
---src_font charset/cjk/simfang.ttf \
+--src_font charset/cjk/STSONG.TTF \
 --dst_font charset/cjk/FZSTK.TTF \
 --charset CN \
 --sample_count 5000 \
