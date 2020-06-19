@@ -108,7 +108,7 @@ class UNet(object):
                     else:
                         dec = batch_norm(dec, is_training, scope="g_d%d_bn" % layer)
                 if dropout:
-                    dec = tf.nn.dropout(dec, 0.5)
+                    dec = tf.nn.dropout(dec, rate=0.5)
                 if do_concat:
                     dec = tf.concat([dec, enc_layer], 3)
                 return dec
