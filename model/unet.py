@@ -379,7 +379,7 @@ class UNet(object):
             os.makedirs(model_sample_dir)
 
         sample_img_path = os.path.join(model_sample_dir, "sample_%02d_%04d.png" % (epoch, step))
-        imageio.mimsave(sample_img_path, merged_pair)
+        imageio.imsave(sample_img_path, merged_pair)
 
     def export_generator(self, save_dir, model_dir, model_name="gen_model"):
         saver = tf.train.Saver()

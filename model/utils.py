@@ -71,7 +71,7 @@ def merge(images, size):
 
 def save_concat_images(imgs, img_path):
     concated = np.concatenate(imgs, axis=1)
-    imageio.mimsave(img_path, concated)
+    imageio.imsave(img_path, concated)
 
 
 def compile_frames_to_gif(frame_dir, gif_file):
@@ -86,5 +86,5 @@ def compile_frames_to_gif(frame_dir, gif_file):
             Image.ANTIALIAS
         )
     ) for f in frames]
-    imageio.mimsave(gif_file, images, duration=0.1)
+    imageio.mimsave(gif_file, images, format='GIF', duration=0.1)
     return gif_file
