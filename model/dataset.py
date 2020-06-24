@@ -5,8 +5,9 @@ import pickle
 import numpy as np
 import random
 import os
+from scipy import ndimage
 from .utils import pad_seq, bytes_to_file, \
-    read_split_image, shift_and_resize_image, normalize_image
+    read_split_image, shift_and_resize_image, normalize_image, rotate_image
 
 
 class PickledImageProvider(object):
@@ -31,7 +32,7 @@ class PickledImageProvider(object):
             return examples
 
 
-def get_batch_iter(examples, batch_size, augment):
+def get_batch_iter(examples, batch_size, augment, rotate=False, bold=False, blur=False):
     # the transpose ops requires deterministic
     # batch size, thus comes the padding
     padded = pad_seq(examples, batch_size)
@@ -47,7 +48,10 @@ def get_batch_iter(examples, batch_size, augment):
                 # NOTE: image A and B needs to be in sync as how much
                 # to be shifted
                 w, h, _ = img_A.shape
-                multiplier = random.uniform(1.00, 1.20)
+                scale_upbound = 1.2
+                if bold:
+                    scale_upbound = 1.4
+                multiplier = random.uniform(1.00, scale_upbound)
                 # add an eps to prevent cropping issue
                 nw = int(multiplier * w) + 1
                 nh = int(multiplier * h) + 1
@@ -55,6 +59,19 @@ def get_batch_iter(examples, batch_size, augment):
                 shift_y = int(np.ceil(np.random.uniform(0.01, nh - h)))
                 img_A = shift_and_resize_image(img_A, shift_x, shift_y, nw, nh)
                 img_B = shift_and_resize_image(img_B, shift_x, shift_y, nw, nh)
+
+                if rotate and random.uniform(0, 1) > 0.9:
+                    angle_list = [-30, 30]
+                    random_angle = random.choice(angle_list)
+                    img_A = rotate_image(img_A, random_angle)
+                    img_B = rotate_image(img_B, random_angle)
+
+                if blur and random.uniform(0.0, 1.0) > 0.8:
+                    sigma_list = [1, 1.5, 2]
+                    sigma = random.choice(sigma_list)
+                    img_A = ndimage.gaussian_filter(img_A, sigma=sigma)
+                    img_B = ndimage.gaussian_filter(img_B, sigma=sigma)
+
             img_A = normalize_image(img_A)
             img_B = normalize_image(img_B)
             return np.concatenate([img_A, img_B], axis=2)
@@ -90,7 +107,7 @@ class TrainDataProvider(object):
         training_examples = self.train.examples[:]
         if shuffle:
             np.random.shuffle(training_examples)
-        return get_batch_iter(training_examples, batch_size, augment=True)
+        return get_batch_iter(training_examples, batch_size, augment=True, rotate=False, bold=True, blur=True)
 
     def get_val_iter(self, batch_size, shuffle=True):
         """

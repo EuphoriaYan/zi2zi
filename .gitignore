@@ -9,3 +9,6 @@ sample_dir/
 
 # experiment
 experiment/
+
+# test
+test.py

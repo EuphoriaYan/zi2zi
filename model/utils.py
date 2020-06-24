@@ -10,6 +10,7 @@ from imageio import imread
 import numpy as np
 from io import StringIO, BytesIO
 from PIL import Image
+from scipy import ndimage
 
 
 def pad_seq(seq, batch_size):
@@ -52,6 +53,18 @@ def shift_and_resize_image(img, shift_x, shift_y, nw, nh):
     # new realization
     enlarged = np.array(Image.fromarray(np.uint8(img)).resize((nw, nh), Image.ANTIALIAS))
     return enlarged[shift_x:shift_x + w, shift_y:shift_y + h]
+
+
+def rotate_image(img, angle):
+    w, h, _ = img.shape
+    # img_rotate = misc.imrotate(img, angle, interp="bilinear")
+    img = Image.fromarray(img)
+    img_rotate = img.rotate(angle,
+                            resample=Image.BILINEAR,
+                            fillcolor=(255, 255, 255))
+    img_rotate = np.array(img_rotate)
+    # img_rotate = ndimage.rotate(img, angle, reshape=False)
+    return img_rotate
 
 
 def scale_back(images):
