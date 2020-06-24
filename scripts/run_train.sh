@@ -1,7 +1,7 @@
-export CUDA_VISIBLE_DEVICES=2,3
+export CUDA_VISIBLE_DEVICES=3
 
 experiment_dir=experiment
-experiment_id=0
+experiment_id=1
 batch_size=32
 learning_rate=1e-3
 epoch=100
