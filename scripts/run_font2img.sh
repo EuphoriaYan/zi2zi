@@ -5,4 +5,6 @@ python font2img.py \
 --charset CN \
 --sample_count 5000 \
 --sample_dir sample_dir \
---label 0
+--label 0 \
+--shuffle \
+--filter

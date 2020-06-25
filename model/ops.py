@@ -2,7 +2,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
 import tensorflow.compat.v1 as tf
-import tensorflow as tf2
 
 
 def batch_norm(x, is_training, epsilon=1e-5, decay=0.9, scope="batch_norm"):

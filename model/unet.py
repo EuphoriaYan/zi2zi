@@ -409,7 +409,7 @@ class UNet(object):
         count = 0
         batch_buffer = list()
         for labels, source_imgs in source_iter:
-            fake_imgs = self.generate_fake_samples(source_imgs, labels)[0]
+            fake_imgs, real_imgs, d_loss, g_loss, l1_loss = self.generate_fake_samples(source_imgs, labels)
             merged_fake_images = merge(scale_back(fake_imgs), [self.batch_size, 1])
             batch_buffer.append(merged_fake_images)
             if len(batch_buffer) == 10:
@@ -497,6 +497,8 @@ class UNet(object):
               freeze_encoder=False, fine_tune=None, sample_steps=50, checkpoint_steps=500):
         g_vars, d_vars = self.retrieve_trainable_vars(freeze_encoder=freeze_encoder)
         input_handle, loss_handle, _, summary_handle = self.retrieve_handles()
+        for var in tf.trainable_variables():
+            print(var)
 
         if not self.sess:
             raise Exception("no session registered")

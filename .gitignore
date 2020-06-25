@@ -6,6 +6,7 @@ experiments/
 
 # fonts sample
 sample_dir/
+infer_sample_dir/
 
 # experiment
 experiment/

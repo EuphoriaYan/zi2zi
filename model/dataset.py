@@ -6,6 +6,7 @@ import numpy as np
 import random
 import os
 from scipy import ndimage
+from PIL import Image
 from .utils import pad_seq, bytes_to_file, \
     read_split_image, shift_and_resize_image, normalize_image, rotate_image
 
@@ -74,7 +75,8 @@ def get_batch_iter(examples, batch_size, augment, rotate=False, bold=False, blur
 
             img_A = normalize_image(img_A)
             img_B = normalize_image(img_B)
-            return np.concatenate([img_A, img_B], axis=2)
+            cat_img = np.concatenate([img_A, img_B], axis=2)
+            return cat_img
         finally:
             img.close()
 
@@ -82,6 +84,7 @@ def get_batch_iter(examples, batch_size, augment, rotate=False, bold=False, blur
         for i in range(0, len(padded), batch_size):
             batch = padded[i: i + batch_size]
             labels = [e[0] for e in batch]
+            # return a (H, W, C*2) ndarray, the first one is dst_fnt, the second one is src_fnt
             processed = [process(e[1]) for e in batch]
             # stack into tensor
             yield labels, np.array(processed).astype(np.float32)
